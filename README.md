@@ -52,8 +52,14 @@ socket_close($sock);
 java -jar logdb-1.0-SNAPSHOT.jar >> /data/logs/java_console/api_log_log/console.log 2>&1 &
 ```
 
+> 强制结束命令，使用下面命令，会回调处理未保存的数据
+
+```shell
+kill -15 pid
+```
+
 ### 数据库
-> 数据表表名 api_log_yyyMMdd
+> 数据表表名 api_log_yyyMMdd，每天一张新表，现在没有支持自动加
 
 ```sql
 CREATE TABLE `api_log_20181130` (
