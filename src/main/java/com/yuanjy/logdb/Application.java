@@ -6,12 +6,13 @@ import com.yuanjy.logdb.service.LogdbService;
 import io.sentry.Sentry;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Application {
 
@@ -21,7 +22,7 @@ public class Application {
 
     private final static long ACTIVE = 120;      //进程存活时间（分钟）
 
-    private static List<Logdb> logdbList = new ArrayList<Logdb>();
+    private static Map<String, List<Logdb>> map = new HashMap<String, List<Logdb>>();
 
     private static LogdbService logdbService = new LogdbService();
 
@@ -31,7 +32,7 @@ public class Application {
      */
     public static void main(String[] args) throws SocketException {
         //注册sentry服务
-        Sentry.init("http://784a46eb444e420f80420a4bc9de2d17@115.159.59.248:9000/x");
+        Sentry.init("http://784a46eb444e420f80420a4bc9de2d17@115.159.59.248:9000/6");
 
         /*
           注册杀死进程回调函数
@@ -61,26 +62,33 @@ public class Application {
                     logdb = gson.fromJson(data, Logdb.class);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    logger.warn("logdb数据，json解析失败");
+                    logger.error("logdb数据，json解析失败");
+                    Sentry.capture("logdb数据，json解析失败");
                     continue;
                 }
                 //logdbService.save(logdb);
                 logger.info(logdb.toString());
-                logdbList.add(logdb);
-                if (logdbList.size() >= 20) {
-                    if (logdbService.batchSave(logdbList) > 0) {
+                if (map.get(logdb.getModule()) == null) {
+                    map.put(logdb.getModule(), new ArrayList<Logdb>());
+                }
+                map.get(logdb.getModule()).add(logdb);
+                if (map.get(logdb.getModule()).size() >= 20) {
+                    int effectRow = logdbService.batchSaveByMap(map);
+                    if (effectRow > 0) {
                         logger.info("logdb批量插入成功");
-                        logdbList.clear();
+                        map.clear();
                     } else {
-                        logger.warn("logdb批量插入异常");
+                        logger.error("logdb批量插入异常");
+                        Sentry.capture("logdb批量插入异常");
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
+                logger.error("logdb 执行异常");
+                Sentry.capture("logdb 执行异常");
                 e.printStackTrace();
             }
             long end = System.currentTimeMillis();
-            flag = (((end - start) / 1000 / 60) < ACTIVE) || (logdbList.size() != 0);  //防止僵尸进程，执行一段时间重启进程
-            //System.out.println((end - start) / 1000 / 60 + " ==== " + logdbList.size());
+            flag = (((end - start) / 1000 / 60) < ACTIVE) || !map.isEmpty();  //防止僵尸进程，执行一段时间重启进程
         } while (flag);
     }
 
@@ -89,13 +97,15 @@ public class Application {
      */
     private static void shutdownCallback() {
         try {
-            if (logdbList.size() > 0) {
-                logdbService.batchSave(logdbList);
-                logger.warn("进程关闭时，保存数据: " + logdbList.toString());
+            if (!map.isEmpty()) {
+                logdbService.batchSaveByMap(map);
+                logger.error("进程关闭时，保存数据: " + map.toString());
+                Sentry.capture("进程关闭时，保存数据: " + map.toString());
             }
         } catch (Exception e) {
             System.out.println("进程关闭时，回调异常");
-            logger.warn("进程关闭时，回调异常: " + logdbList.toString());
+            logger.error("进程关闭时，回调异常: " + map.toString());
+            Sentry.capture("进程关闭时，回调异常: " + map.toString());
             e.printStackTrace();
         }
     }

@@ -1,6 +1,7 @@
 package com.yuanjy.logdb.pojo;
 
 public class Logdb {
+    private String module;
     private Integer uid;
     private String apiName;
     private String requestMethod;
@@ -13,7 +14,19 @@ public class Logdb {
     private String serverIp;
     private Integer endTime;
     private Integer spendTime;
+    private String system;
+    private String brand;
+    private String model;
     private String version;
+    private String appVersion;
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
 
     public Integer getUid() {
         return uid;
@@ -29,6 +42,14 @@ public class Logdb {
 
     public void setApiName(String apiName) {
         this.apiName = apiName;
+    }
+
+    public String getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(String requestMethod) {
+        this.requestMethod = requestMethod;
     }
 
     public String getParamJson() {
@@ -103,6 +124,30 @@ public class Logdb {
         this.spendTime = spendTime;
     }
 
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     public String getVersion() {
         return version;
     }
@@ -111,29 +156,35 @@ public class Logdb {
         this.version = version;
     }
 
-    public String getRequestMethod() {
-        return requestMethod;
+    public String getAppVersion() {
+        return appVersion;
     }
 
-    public void setRequestMethod(String requestMethod) {
-        this.requestMethod = requestMethod;
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
     }
 
     @Override
     public String toString() {
         return "Logdb{" +
-                "uid=" + uid +
+                "module='" + module + '\'' +
+                ", uid=" + uid +
                 ", apiName='" + apiName + '\'' +
+                ", requestMethod='" + requestMethod + '\'' +
                 ", paramJson='" + paramJson + '\'' +
+                ", response='" + response + '\'' +
                 ", status=" + status +
                 ", errCode=" + errCode +
-                ", errMessage=" + errMessage +
+                ", errMessage='" + errMessage + '\'' +
                 ", userIp='" + userIp + '\'' +
                 ", serverIp='" + serverIp + '\'' +
                 ", endTime=" + endTime +
                 ", spendTime=" + spendTime +
+                ", system='" + system + '\'' +
+                ", brand='" + brand + '\'' +
+                ", model='" + model + '\'' +
                 ", version='" + version + '\'' +
-                ", requestMethod='" + requestMethod + '\'' +
+                ", appVersion='" + appVersion + '\'' +
                 '}';
     }
 }
