@@ -144,7 +144,7 @@ CREATE TABLE `admin_log_20181213` (
 
 > 更新项：  
 1、自动创建新的数据表  
-2、使用redis缓存
+2、使用redis缓存   
 3、log4j 版本更新，1.x 更新为 2.x  
 
 
