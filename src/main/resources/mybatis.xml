@@ -29,5 +29,6 @@
 
     <mappers>
         <mapper resource="mapper/Logdb.xml" />
+        <mapper resource="mapper/Table.xml" />
     </mappers>
 </configuration>

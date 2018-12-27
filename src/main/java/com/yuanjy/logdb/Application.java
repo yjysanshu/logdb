@@ -20,7 +20,7 @@ public class Application {
 
     private final static int PORT = 1217;       //UDP监听的端口
 
-    private final static long ACTIVE = 120;      //进程存活时间（分钟）
+    private final static int ACTIVE = 360;      //进程存活时间（分钟）
 
     private static Map<String, List<Logdb>> map = new HashMap<String, List<Logdb>>();
 
@@ -31,6 +31,17 @@ public class Application {
      * @param args 命令行参数
      */
     public static void main(String[] args) throws SocketException {
+        int port = PORT;
+        int activeTime = ACTIVE;
+
+        if (args.length >= 1) {
+            port = Integer.parseInt(args[0]);
+        }
+
+        if (args.length >= 2) {
+            activeTime = Integer.parseInt(args[1]);
+        }
+
         //注册sentry服务
         Sentry.init("http://784a46eb444e420f80420a4bc9de2d17@115.159.59.248:9000/6");
 
@@ -44,8 +55,8 @@ public class Application {
             }
         });
 
-        DatagramSocket socket = new DatagramSocket(PORT);
-        System.out.println("开始监听UDP端口: " + PORT);
+        DatagramSocket socket = new DatagramSocket(port);
+        System.out.println("开始监听UDP端口: " + port);
         long start = System.currentTimeMillis();    //进程开始时间
         boolean flag = true;
 
@@ -62,7 +73,7 @@ public class Application {
                     logdb = gson.fromJson(data, Logdb.class);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    logger.error("logdb数据，json解析失败");
+                    logger.error("logdb数据，json解析失败: " + data);
                     Sentry.capture("logdb数据，json解析失败");
                     continue;
                 }
@@ -88,7 +99,7 @@ public class Application {
                 e.printStackTrace();
             }
             long end = System.currentTimeMillis();
-            flag = (((end - start) / 1000 / 60) < ACTIVE) || !map.isEmpty();  //防止僵尸进程，执行一段时间重启进程
+            flag = (((end - start) / 1000 / 60) < activeTime) || !map.isEmpty();  //防止僵尸进程，执行一段时间重启进程
         } while (flag);
     }
 

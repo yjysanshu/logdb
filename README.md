@@ -130,7 +130,7 @@ CREATE TABLE `admin_log_20181213` (
   `spend_time` int(11) NOT NULL DEFAULT '0' COMMENT '接口耗时',
   `system` varchar(20) NOT NULL DEFAULT '' COMMENT '操作系统',
   `brand` varchar(32) NOT NULL DEFAULT '' COMMENT '手机品牌',
-  `model` varchar(32) NOT NULL DEFAULT '' COMMENT '手机型号',
+  `model` varchar(64) NOT NULL DEFAULT '' COMMENT '手机型号',
   `version` varchar(20) NOT NULL DEFAULT '' COMMENT '微信程序版本',
   `app_version` varchar(20) NOT NULL DEFAULT '' COMMENT '应用程序版本',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -139,3 +139,14 @@ CREATE TABLE `admin_log_20181213` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='接口信息调用表'
 
 ```
+
+## logdb 1.2
+
+> 更新项：  
+1、自动创建新的数据表  
+2、使用redis缓存
+3、log4j 版本更新，1.x 更新为 2.x  
+
+
+
+> QQ：1109563194

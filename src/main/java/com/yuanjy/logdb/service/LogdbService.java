@@ -2,9 +2,15 @@ package com.yuanjy.logdb.service;
 
 import com.yuanjy.logdb.constant.CommonConst;
 import com.yuanjy.logdb.pojo.Logdb;
+import com.yuanjy.logdb.pojo.Table;
 import com.yuanjy.logdb.util.DateUtil;
+import com.yuanjy.logdb.util.RedisPoolUtil;
 import com.yuanjy.logdb.util.SessionFactoryUtil;
+import io.sentry.Sentry;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +18,50 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class LogdbService {
+
+    private Logger logger = LogManager.getLogger(LogdbService.class);
+
+    /**
+     * 是否创建数据表
+     * @param tableName 表名
+     * @param session mysql
+     * @return bool
+     */
+    public Boolean checkAndCreateTable(String tableName, SqlSession session) {
+        String key = "IS_HAVING_TABLE_" + tableName;
+        Jedis jedis = null;
+        try {
+            jedis = RedisPoolUtil.getJedis();
+            if (jedis != null) {
+                String str = jedis.get(key);
+                if (str != null) {
+                    return true;
+                }
+
+                //查看是否存在数据表，不存在，则创建数据表
+                if (this.isExitTable(tableName, session) || this.createTable(tableName, session)) {
+                    jedis.set(key, "1", "EX", 86400);
+                    return true;
+                }
+                logger.error("创建数据表：" + tableName + " 失败");
+            } else {
+                //查看是否存在数据表，不存在，则创建数据表
+                if (this.isExitTable(tableName, session) || this.createTable(tableName, session)) {
+                    return true;
+                }
+                logger.error("未获取到redis，创建数据表： " + tableName + " 失败");
+            }
+            return false;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            Sentry.capture(e);
+            return false;
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
+        }
+    }
 
     /**
      * 批量插入log信息
@@ -29,10 +79,14 @@ public class LogdbService {
                 continue;
             }
             String tableName = this.getTableName(entry.getKey());
-            Map<String, Object> param = new HashMap<String, Object>();
-            param.put("tableName", tableName);
-            param.put("list", entry.getValue());
-            affectRow += session.insert("batchInsert", param);
+            if (this.checkAndCreateTable(tableName, session)) {
+                Map<String, Object> param = new HashMap<String, Object>();
+                param.put("tableName", tableName);
+                param.put("list", entry.getValue());
+                affectRow += session.insert("batchInsert", param);
+            } else {
+                logger.error("查询或创建数据表失败：" + tableName);
+            }
         }
         return affectRow;
     }
@@ -66,13 +120,37 @@ public class LogdbService {
     }
 
     /**
-     * 新建数据表
-     * @return int
+     * 判断表是否存在
+     * @param tableName 表名
+     * @param session mysql
+     * @return bool
      */
-    public Integer createTable() {
-        String tableName = this.getTableName();
-        SqlSession session = SessionFactoryUtil.getSession();
-        return session.insert("createTable", tableName);
+    private Boolean isExitTable(String tableName, SqlSession session) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tableName", tableName);
+        map.put("databaseName", "logdb");
+        List<Table> list = session.selectList("isExitTable", map);
+        return list.size() > 0;
+    }
+
+    /**
+     * 新建数据表
+     * @param tableName 表名
+     * @param session mysql
+     * @return bool
+     */
+    private Boolean createTable(String tableName, SqlSession session) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tableName", tableName);
+        try {
+            session.insert("createTable", map);
+            return true;
+        } catch (Exception e) {
+            logger.error("创建数据库失败: " + tableName);
+            logger.error(e.getMessage());
+            Sentry.capture(e);
+            return false;
+        }
     }
 
     /**

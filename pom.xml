@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.qiezilife</groupId>
+    <groupId>com.yuanjy</groupId>
     <artifactId>logdb</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -35,15 +35,23 @@
             <version>3.3.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.7</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.10.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.sentry</groupId>
-            <artifactId>sentry-log4j</artifactId>
+            <artifactId>sentry-log4j2</artifactId>
             <version>1.7.5</version>
         </dependency>
 
@@ -52,6 +60,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>1.7.25</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.10.0</version>
         </dependency>
 
     </dependencies>
@@ -72,8 +87,8 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.yuanjy.logdb.Application</Main-Class>
-                                        <Build-Number>123</Build-Number>
+                                        <Main-Class>com.qiezilife.logdb.Application</Main-Class>
+                                        <Build-Number>1234</Build-Number>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
@@ -83,5 +98,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>

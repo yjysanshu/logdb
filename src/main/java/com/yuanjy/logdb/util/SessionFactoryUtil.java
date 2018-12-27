@@ -20,7 +20,7 @@ public class SessionFactoryUtil {
         try {
             InputStream stream = Resources.getResourceAsStream("mybatis.xml");
             // 判断SqlSessionFactory是否为空，如果为空则创建
-            if(sessionFactory==null){
+            if(sessionFactory == null){
                 sessionFactory = new SqlSessionFactoryBuilder().build(stream);
             }
         } catch (IOException e) {
