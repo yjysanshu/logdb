@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.yuanjy.logdb.pojo.Logdb;
 import com.yuanjy.logdb.service.LogdbService;
 import io.sentry.Sentry;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,11 +17,13 @@ import java.util.Map;
 
 public class Application {
 
-    private static Logger logger = Logger.getLogger(Application.class);
+    private static Logger logger = LogManager.getLogger(Application.class);
 
     private final static int PORT = 1217;       //UDP监听的端口
 
     private final static int ACTIVE = 360;      //进程存活时间（分钟）
+
+    private final static int MAX_SIZE = 20;      //最大插入数据库的个数
 
     private static Map<String, List<Logdb>> map = new HashMap<String, List<Logdb>>();
 
@@ -31,19 +34,12 @@ public class Application {
      * @param args 命令行参数
      */
     public static void main(String[] args) throws SocketException {
-        int port = PORT;
-        int activeTime = ACTIVE;
-
-        if (args.length >= 1) {
-            port = Integer.parseInt(args[0]);
-        }
-
-        if (args.length >= 2) {
-            activeTime = Integer.parseInt(args[1]);
-        }
+        int port = judgeAndAssignment(args, 0, PORT);
+        int activeTime = judgeAndAssignment(args, 1, ACTIVE);
+        int maxSize = judgeAndAssignment(args, 2, MAX_SIZE);
 
         //注册sentry服务
-        Sentry.init("http://784a46eb444e420f80420a4bc9de2d17@115.159.59.248:9000/6");
+        Sentry.init("http://747893dba61648a6b03a41f397cef977:fc6f1f77674442fc94fedfdff83d2bc0@115.159.59.248:9000/2");
 
         /*
           注册杀死进程回调函数
@@ -56,12 +52,12 @@ public class Application {
         });
 
         DatagramSocket socket = new DatagramSocket(port);
-        System.out.println("开始监听UDP端口: " + port);
+        System.out.println("开始监听UDP端口: " + port + " 进程活跃时间: " + activeTime + " 最大缓存数量: " + maxSize);
         long start = System.currentTimeMillis();    //进程开始时间
         boolean flag = true;
 
         do {
-            byte[] buf = new byte[10240];   //暂定接收的数据为1M，前端传过来的json不能超过这么大，否则解析异常
+            byte[] buf = new byte[10240];   //暂定接收的数据为10k，前端传过来的json不能超过这么大，否则解析异常
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
                 socket.receive(packet);
@@ -72,6 +68,7 @@ public class Application {
                 try {
                     logdb = gson.fromJson(data, Logdb.class);
                 } catch (Exception e) {
+                    Sentry.capture(e);
                     e.printStackTrace();
                     logger.error("logdb数据，json解析失败: " + data);
                     Sentry.capture("logdb数据，json解析失败");
@@ -83,23 +80,28 @@ public class Application {
                     map.put(logdb.getModule(), new ArrayList<Logdb>());
                 }
                 map.get(logdb.getModule()).add(logdb);
-                if (map.get(logdb.getModule()).size() >= 20) {
+                if (map.get(logdb.getModule()).size() >= maxSize) {
                     int effectRow = logdbService.batchSaveByMap(map);
                     if (effectRow > 0) {
                         logger.info("logdb批量插入成功");
                         map.clear();
                     } else {
                         logger.error("logdb批量插入异常");
-                        Sentry.capture("logdb批量插入异常");
                     }
                 }
             } catch (Exception e) {
                 logger.error("logdb 执行异常");
-                Sentry.capture("logdb 执行异常");
+                Sentry.capture(e);
                 e.printStackTrace();
             }
             long end = System.currentTimeMillis();
-            flag = (((end - start) / 1000 / 60) < activeTime) || !map.isEmpty();  //防止僵尸进程，执行一段时间重启进程
+
+            //判断是否要关闭进程
+            if (activeTime == 0) {
+                flag = true;
+            } else {
+                flag = (((end - start) / 1000 / 60) < activeTime) || !map.isEmpty();  //防止僵尸进程，执行一段时间重启进程
+            }
         } while (flag);
     }
 
@@ -117,7 +119,22 @@ public class Application {
             System.out.println("进程关闭时，回调异常");
             logger.error("进程关闭时，回调异常: " + map.toString());
             Sentry.capture("进程关闭时，回调异常: " + map.toString());
+            Sentry.capture(e);
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 判断并获取值
+     * @param args 数组参数
+     * @param index 下标
+     * @param defaultValue 默认值
+     * @return int
+     */
+    private static int judgeAndAssignment(String[] args, int index, int defaultValue) {
+        if (args.length > index) {
+            return Integer.parseInt(args[index]);
+        }
+        return defaultValue;
     }
 }
