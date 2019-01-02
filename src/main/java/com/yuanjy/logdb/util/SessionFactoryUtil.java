@@ -28,5 +28,4 @@ public class SessionFactoryUtil {
         }
         return sessionFactory.openSession(true);
     }
-
 }

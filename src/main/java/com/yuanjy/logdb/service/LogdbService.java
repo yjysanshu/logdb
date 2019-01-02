@@ -68,25 +68,31 @@ public class LogdbService {
      * @param map logdb列表
      * @return int
      */
-    public Integer batchSaveByMap(Map<String, List<Logdb>> map) {
+    public Integer batchSaveByMap(Map<String, List<Logdb>> map) throws Exception {
         if (map.isEmpty()) {
             return CommonConst.ERROR;
         }
         Integer affectRow = 0;
         SqlSession session = SessionFactoryUtil.getSession();
-        for (Entry<String, List<Logdb>> entry : map.entrySet()) {
-            if (entry.getValue().size() <= 0) {
-                continue;
+        try {
+            for (Entry<String, List<Logdb>> entry : map.entrySet()) {
+                if (entry.getValue().size() <= 0) {
+                    continue;
+                }
+                String tableName = this.getTableName(entry.getKey());
+                if (this.checkAndCreateTable(tableName, session)) {
+                    Map<String, Object> param = new HashMap<String, Object>();
+                    param.put("tableName", tableName);
+                    param.put("list", entry.getValue());
+                    affectRow += session.insert("batchInsert", param);
+                } else {
+                    logger.error("查询或创建数据表失败：" + tableName);
+                }
             }
-            String tableName = this.getTableName(entry.getKey());
-            if (this.checkAndCreateTable(tableName, session)) {
-                Map<String, Object> param = new HashMap<String, Object>();
-                param.put("tableName", tableName);
-                param.put("list", entry.getValue());
-                affectRow += session.insert("batchInsert", param);
-            } else {
-                logger.error("查询或创建数据表失败：" + tableName);
-            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            session.close();
         }
         return affectRow;
     }

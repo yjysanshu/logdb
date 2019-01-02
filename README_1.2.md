@@ -1,11 +1,13 @@
 # 简易Logdb项目
 
-## logdb 1.3
+## logdb 1.2
 
 > 旧版本在 resource/template 中，说明在README_XX.md中
 
 > 更新项：  
-引入线程概念、主线程main作为udp接收者，新增两个线程解析和保存数据  
+1、自动创建新的数据表  
+2、使用redis缓存   
+3、log4j 版本更新，1.x 更新为 2.x  
 
 ### UDP客户端
 ---
@@ -45,7 +47,7 @@ socket_close($sock);
 > 把该项目打包，执行下面命令
 
 ```shell
-java -jar logdb-1.3-SNAPSHOT.jar >> /data/logs/java_console/api_log_log/console.log 2>&1 &
+java -jar logdb-1.2-SNAPSHOT.jar >> /data/logs/java_console/api_log_log/console.log 2>&1 &
 ```
 
 > 强制结束命令，使用下面命令，会回调处理未保存的数据
