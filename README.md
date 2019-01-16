@@ -5,7 +5,8 @@
 > 旧版本在 resource/template 中，说明在README_XX.md中
 
 > 更新项：  
-引入线程概念、主线程main作为udp接收者，新增两个线程解析和保存数据  
+引入线程概念、主线程main作为udp接收者，新增两个线程解析和保存数据
+不采用批量保存，一条一条的保存数据，保证接口调用的顺序在数据库里面正确的体现
 
 ### UDP客户端
 ---
@@ -55,10 +56,10 @@ kill -15 pid
 ```
 
 ### 数据库
-> 根据不同的模块(module)把数据插入不同的表中 api_log_yyyMMdd admin_log_yyyMMdd 每天一张新表，支持自动创建数据表
+> 根据不同的模块(module)把数据插入不同的表中 api_log_yyyMMdd admin_log_yyyMM 每月一张新表，支持自动创建数据表
 
 ```sql
-CREATE TABLE `admin_log_20181213` (
+CREATE TABLE `admin_log_201812` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `uid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
   `api_name` varchar(100) NOT NULL DEFAULT '' COMMENT '接口uri',

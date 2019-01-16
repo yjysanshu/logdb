@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.qiezilife.logdb.mapper.Logdb" >
+<mapper namespace="com.qiezilife.logdb.mapper.Logdb">
 
-    <resultMap id="BaseResultMap" type="com.qiezilife.logdb.pojo.Logdb" >
+    <resultMap id="BaseResultMap" type="com.qiezilife.logdb.pojo.Logdb">
         <id column="id" property="id" jdbcType="INTEGER" />
         <result column="uid" property="uid" jdbcType="INTEGER" />
         <result column="api_name" property="apiName" jdbcType="VARCHAR" />
@@ -24,7 +24,7 @@
         <result column="appVersion" property="app_version" jdbcType="VARCHAR" />
     </resultMap>
 
-    <sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
         id, uid, api_name, request_method, param_json, status, err_code, err_message, user_ip, server_ip, end_time,
         spend_time, system, brand, model, version, app_version
     </sql>
@@ -35,104 +35,128 @@
         FROM api_log_t
     </select>
 
-    <insert id="insert" parameterType="java.util.Map" >
+    <insert id="insert" parameterType="java.util.Map">
         INSERT INTO ${tableName}
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="logdb.uid != null" >
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="logdb.uid != null">
                 uid,
             </if>
-            <if test="logdb.apiName != null" >
+            <if test="logdb.apiName != null">
                 api_name,
             </if>
-            <if test="logdb.requestMethod != null" >
+            <if test="logdb.requestMethod != null">
                 request_method,
             </if>
-            <if test="logdb.paramJson != null" >
+            <if test="logdb.paramJson != null">
                 param_json,
             </if>
-            <if test="logdb.response != null" >
+            <if test="logdb.response != null">
                 response,
             </if>
-            <if test="logdb.status != null" >
+            <if test="logdb.status != null">
                 status,
             </if>
-            <if test="logdb.errCode != null" >
+            <if test="logdb.errCode != null">
                 err_code,
             </if>
-            <if test="logdb.errMessage != null" >
+            <if test="logdb.errMessage != null">
                 err_message,
             </if>
-            <if test="logdb.userIp != null" >
+            <if test="logdb.userIp != null">
                 user_ip,
             </if>
-            <if test="logdb.serverIp != null" >
+            <if test="logdb.serverIp != null">
                 server_ip,
             </if>
-            <if test="logdb.endTime != null" >
+            <if test="logdb.endTime != null">
                 end_time,
             </if>
-            <if test="logdb.spendTime != null" >
+            <if test="logdb.spendTime != null">
                 spend_time,
             </if>
-            <if test="logdb.version != null" >
+            <if test="logdb.system != null">
+                system,
+            </if>
+            <if test="logdb.brand != null">
+                brand,
+            </if>
+            <if test="logdb.model != null">
+                model,
+            </if>
+            <if test="logdb.version != null">
                 version,
             </if>
+            <if test="logdb.appVersion != null">
+                app_version,
+            </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="logdb.uid != null" >
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="logdb.uid != null">
                 #{logdb.uid,jdbcType=INTEGER},
             </if>
-            <if test="logdb.apiName != null" >
+            <if test="logdb.apiName != null">
                 #{logdb.apiName,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.requestMethod != null" >
+            <if test="logdb.requestMethod != null">
                 #{logdb.requestMethod,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.paramJson != null" >
+            <if test="logdb.paramJson != null">
                 #{logdb.paramJson,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.response != null" >
+            <if test="logdb.response != null">
                 #{logdb.response,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.status != null" >
+            <if test="logdb.status != null">
                 #{logdb.status,jdbcType=INTEGER},
             </if>
-            <if test="logdb.errCode != null" >
+            <if test="logdb.errCode != null">
                 #{logdb.errCode,jdbcType=INTEGER},
             </if>
-            <if test="logdb.errMessage != null" >
+            <if test="logdb.errMessage != null">
                 #{logdb.errMessage,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.userIp != null" >
+            <if test="logdb.userIp != null">
                 #{logdb.userIp,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.serverIp != null" >
+            <if test="logdb.serverIp != null">
                 #{logdb.serverIp,jdbcType=VARCHAR},
             </if>
-            <if test="logdb.endTime != null" >
+            <if test="logdb.endTime != null">
                 #{logdb.endTime,jdbcType=INTEGER},
             </if>
-            <if test="logdb.spendTime != null" >
+            <if test="logdb.spendTime != null">
                 #{logdb.spendTime,jdbcType=INTEGER},
             </if>
-            <if test="logdb.version != null" >
+            <if test="logdb.system != null">
+                #{logdb.system,jdbcType=INTEGER},
+            </if>
+            <if test="logdb.brand != null">
+                #{logdb.brand,jdbcType=INTEGER},
+            </if>
+            <if test="logdb.model != null">
+                #{logdb.model,jdbcType=INTEGER},
+            </if>
+            <if test="logdb.version != null">
                 #{logdb.version,jdbcType=VARCHAR},
+            </if>
+            <if test="logdb.appVersion != null">
+                #{logdb.appVersion,jdbcType=INTEGER},
             </if>
         </trim>
     </insert>
 
     <!-- 批量插入数据 -->
-    <insert id="batchInsert" parameterType="java.util.Map" >
+    <insert id="batchInsert" parameterType="java.util.Map">
         INSERT INTO ${tableName} (uid, api_name, request_method, param_json, response, status, err_code,
         err_message, user_ip, server_ip, end_time, spend_time, system, brand, model, version, app_version) values
         <foreach collection="list" item="logdb" index="index" separator=",">
             (
-            #{logdb.uid,jdbcType=INTEGER},#{logdb.apiName,jdbcType=VARCHAR},#{logdb.requestMethod,jdbcType=VARCHAR},
-            #{logdb.paramJson,jdbcType=VARCHAR},#{logdb.response,jdbcType=VARCHAR},#{logdb.status,jdbcType=INTEGER},
-            #{logdb.errCode,jdbcType=INTEGER},#{logdb.errMessage,jdbcType=VARCHAR},#{logdb.userIp,jdbcType=VARCHAR},
-            #{logdb.serverIp,jdbcType=VARCHAR},#{logdb.endTime,jdbcType=INTEGER},#{logdb.spendTime,jdbcType=INTEGER},
-            #{logdb.system,jdbcType=VARCHAR},#{logdb.brand,jdbcType=VARCHAR},#{logdb.model,jdbcType=VARCHAR},
-            #{logdb.version,jdbcType=VARCHAR},#{logdb.appVersion,jdbcType=VARCHAR}
+                #{logdb.uid,jdbcType=INTEGER},#{logdb.apiName,jdbcType=VARCHAR},#{logdb.requestMethod,jdbcType=VARCHAR},
+                #{logdb.paramJson,jdbcType=VARCHAR},#{logdb.response,jdbcType=VARCHAR},#{logdb.status,jdbcType=INTEGER},
+                #{logdb.errCode,jdbcType=INTEGER},#{logdb.errMessage,jdbcType=VARCHAR},#{logdb.userIp,jdbcType=VARCHAR},
+                #{logdb.serverIp,jdbcType=VARCHAR},#{logdb.endTime,jdbcType=INTEGER},#{logdb.spendTime,jdbcType=INTEGER},
+                #{logdb.system,jdbcType=VARCHAR},#{logdb.brand,jdbcType=VARCHAR},#{logdb.model,jdbcType=VARCHAR},
+                #{logdb.version,jdbcType=VARCHAR},#{logdb.appVersion,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

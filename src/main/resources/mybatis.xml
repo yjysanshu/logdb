@@ -9,20 +9,26 @@
     </settings>
 
     <typeAliases>
-        <package name="com.qiezilife.logdb.pojo" />
+        <typeAlias type="com.yuanjy.logdb.util.DruidDataSourceFactory" alias="DRUID" />
     </typeAliases>
 
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
             <!-- 配置数据库连接信息 -->
-            <dataSource type="POOLED">
+            <dataSource type="DRUID">
                 <property name="driver" value="${jdbc.driver}"/>
                 <property name="url" value="${jdbc.url}"/>
                 <property name="username" value="${jdbc.username}"/>
                 <property name="password" value="${jdbc.password}"/>
-                <property name="poolMaximumActiveConnections" value="${jdbc.maxActive}" />
-                <property name="poolMaximumIdleConnections" value="${jdbc.maxIdle}" />
+                <property name="maxActive" value="${druid.maxActive}" />
+                <property name="filters" value="slf4j" />
+                <property name="validationQuery" value="${druid.validationQuery}" />
+                <property name="testWhileIdle" value="${druid.testWhileIdle}" />
+                <property name="testOnBorrow" value="${druid.testOnBorrow}" />
+                <property name="testOnReturn" value="${druid.testOnReturn}" />
+                <property name="poolPreparedStatements" value="${druid.poolPreparedStatements}" />
+                <property name="maxPoolPreparedStatementPerConnectionSize" value="${druid.maxPoolPreparedStatementPerConnectionSize}" />
             </dataSource>
         </environment>
     </environments>

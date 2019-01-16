@@ -25,6 +25,14 @@ public class DateUtil {
         return (new SimpleDateFormat("yyyyMMdd")).format(new Date());
     }
 
+    /**
+     * 获取没有中心横线的年月格式
+     * @return string
+     */
+    public static String getTYm() {
+        return (new SimpleDateFormat("yyyyMM")).format(new Date());
+    }
+
     public static String getYmd(int num) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, num);

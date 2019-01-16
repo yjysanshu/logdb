@@ -16,7 +16,7 @@ public final class RedisPoolUtil {
     //Redis的端口号
     private static Integer PORT = 6379;
     //访问密码
-    private static String AUTH = "YUANjy123";
+    private static String AUTH = "";    //Redis访问密码
 
     //可用连接实例的最大数目，默认为8；
     //如果赋值为-1，则表示不限制，如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)
@@ -59,7 +59,6 @@ public final class RedisPoolUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -71,7 +70,7 @@ public final class RedisPoolUtil {
             if (jedisPool != null) {
                 return jedisPool.getResource();
             }
-            logger.error("获取redis链接失败");
+            logger.error("获取redis链接失败1");
             return null;
         } catch (Exception e) {
             logger.error("创建redis链接失败");

@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration status="INFO" packages="org.apache.logging.log4j.core, io.sentry.log4j2">
+<configuration status="INFO" shutdownHook="disable" packages="org.apache.logging.log4j.core, io.sentry.log4j2">
+    <Properties>
+        <Property name="LOG_DIR">/data/logs/java_console/api_log_log</Property>
+    </Properties>
+
     <appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="%d{yy-MM-dd.HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
 
-        <File name="log" fileName="/data/logs/java_console/api_log_log/app-log.log" append="true">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+        <File name="log" fileName="${LOG_DIR}/app-log.log" append="true">
+            <PatternLayout pattern="%d{yy-MM-dd.HH:mm:ss.SSS} [%t] %-5level %class{36} %L %M - %msg%xEx%n"/>
         </File>
-
-        <RollingFile name="RollingFile" fileName="/data/logs/java_console/api_log_log/app-logdb.log"
-                     filePattern="app-logdb-%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %class{36} %L %M - %msg%xEx%n"/>
+        <RollingFile name="RollingFile" fileName="${LOG_DIR}/app-logdb.log"
+                     filePattern="${LOG_DIR}/app-logdb-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="%d{yy-MM-dd.HH:mm:ss.SSS} [%t] %-5level %class{36} %L %M - %msg%xEx%n"/>
             <SizeBasedTriggeringPolicy size="50MB"/>
             <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
             <DefaultRolloverStrategy max="20"/>

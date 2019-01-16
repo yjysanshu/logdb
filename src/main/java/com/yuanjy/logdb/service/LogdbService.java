@@ -69,7 +69,9 @@ public class LogdbService {
      * @return int
      */
     public Integer batchSaveByMap(Map<String, List<Logdb>> map) throws Exception {
+        Logger logger = LogManager.getLogger(Thread.currentThread().getName());
         if (map.isEmpty()) {
+            logger.error("[careful] 空的！");
             return CommonConst.ERROR;
         }
         Integer affectRow = 0;
@@ -90,10 +92,12 @@ public class LogdbService {
                 }
             }
         } catch (Exception e) {
+            logger.error(e.getMessage());
             throw e;
         } finally {
             session.close();
         }
+        logger.error("[careful] 受影响的行数：" + affectRow);
         return affectRow;
     }
 
@@ -116,13 +120,26 @@ public class LogdbService {
      * @param logdb logdb对象
      * @return int
      */
-    public Integer save(Logdb logdb) {
-        String tableName = this.getTableName();
-        Map<String, Object> param = new HashMap<String, Object>();
-        param.put("tableName", tableName);
-        param.put("logdb", logdb);
+    public Integer save(Logdb logdb) throws Exception {
+        Integer affectRow = 0;
         SqlSession session = SessionFactoryUtil.getSession();
-        return session.insert("insert", param);
+        try {
+            String tableName = this.getTableName(logdb.getModule());
+            if (this.checkAndCreateTable(tableName, session)) {
+                Map<String, Object> param = new HashMap<String, Object>();
+                param.put("tableName", tableName);
+                param.put("logdb", logdb);
+                affectRow = session.insert("insert", param);
+            } else {
+                logger.error("查询或创建数据表失败：" + tableName);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw e;
+        } finally {
+            session.close();
+        }
+        return affectRow;
     }
 
     /**
@@ -164,7 +181,7 @@ public class LogdbService {
      * @return string
      */
     private String getTableName(String module) {
-        return module + "_log_" + DateUtil.getTYmd();
+        return module + "_log_" + DateUtil.getTYm();
     }
 
     /**

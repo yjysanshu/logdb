@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class SessionFactoryUtil {
+    private static final String configFile = "mybatis.xml";
     // 创建需要单例的对象实例
     private static SqlSessionFactory sessionFactory;
 
@@ -18,7 +19,7 @@ public class SessionFactoryUtil {
     // 对外提供访问接口
     public static synchronized SqlSession getSession(){
         try {
-            InputStream stream = Resources.getResourceAsStream("mybatis.xml");
+            InputStream stream = Resources.getResourceAsStream(configFile);
             // 判断SqlSessionFactory是否为空，如果为空则创建
             if(sessionFactory == null){
                 sessionFactory = new SqlSessionFactoryBuilder().build(stream);

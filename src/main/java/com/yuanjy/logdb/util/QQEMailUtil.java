@@ -14,8 +14,8 @@ public class QQEMailUtil {
     private static final boolean EMAIL_SMTP_SSL_ENABLE = true;
     private static final boolean EMAIL_DEBUG = true;
 
-    private static final String EMAIL_USER = "";
-    private static final String EMAIL_PASSWORD = "";
+    private static final String EMAIL_USER = "QQ邮箱";        //发送者的账号
+    private static final String EMAIL_PASSWORD = "开通的密码，非登录密码";    //发送者的密码
     //SENTRY_EMAIL_USE_TLS=true
 
     public static boolean sendMail(String userMail, String title, String content) {
@@ -35,13 +35,7 @@ public class QQEMailUtil {
         try {
             // 设置发件人邮箱地址
             message.setFrom(new InternetAddress(EMAIL_USER));
-            // 设置收件人邮箱地址
-//            message.setRecipients(Message.RecipientType.TO,
-//                    new InternetAddress[] {
-//                            new InternetAddress(userMail),
-//                            new InternetAddress(userMail)
-//                    }
-//            );
+            // 设置一个收件人
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(userMail));//一个收件人
             // 设置邮件标题
             message.setSubject(title);
